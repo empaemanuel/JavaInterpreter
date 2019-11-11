@@ -19,5 +19,29 @@
 *.tar.gz
 *.rar
 
+#Classpath
+*.classpath
+
+#Settings
+/.settings/
+*.setting
+
+#Projektfilter
+*.project
+
+#Prefs
+*.pref
+/target/
+
+#IntelliJ files
+/.idea/
+*.iml
+
+#CodeMR
+/codemr/
+
+#MAC OS file
+.DS_Store
+
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
