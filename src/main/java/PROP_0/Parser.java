@@ -17,4 +17,73 @@ public class Parser implements IParser {
     }
 
 
+
+
+
+    public class BlockNode implements INode {
+        public Object evaluate(Object[] args) throws Exception {
+            return null;
+        }
+
+        public void buildString(StringBuilder builder, int tabs) {
+
+        }
+    }
+
+
+    public class AssignmentNode implements INode {
+        public Object evaluate(Object[] args) throws Exception {
+            return null;
+        }
+
+        public void buildString(StringBuilder builder, int tabs) {
+
+        }
+    }
+
+
+    public class ExpressionNode implements INode{
+        public Object evaluate(Object[] args) throws Exception {
+            return null;
+        }
+
+        public void buildString(StringBuilder builder, int tabs) {
+
+        }
+    }
+
+    public class FactorNode implements INode {
+        public Object evaluate(Object[] args) throws Exception {
+            return null;
+        }
+
+        public void buildString(StringBuilder builder, int tabs) {
+
+        }
+    }
+
+
+    public class StatementNode implements INode{
+        public Object evaluate(Object[] args) throws Exception {
+            return null;
+        }
+
+        public void buildString(StringBuilder builder, int tabs) {
+
+        }
+    }
+
+
+    public class TermNode implements INode {
+        public Object evaluate(Object[] args) throws Exception {
+            return null;
+        }
+
+        public void buildString(StringBuilder builder, int tabs) {
+
+        }
+    }
+
+
+
 }
