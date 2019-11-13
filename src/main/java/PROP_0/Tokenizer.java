@@ -2,11 +2,11 @@ package main.java.PROP_0;
 
 import java.io.IOException;
 
+
 public class Tokenizer implements ITokenizer {
     Scanner scanner = new Scanner();
     Lexeme current = null;
 
-    //Denna ska vi skriva
     public void open(String fileName) throws IOException, TokenizerException {
 
     }
