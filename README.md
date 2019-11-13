@@ -14,3 +14,9 @@ Det är Lexeme, Parser, Tokenizer och Evaluator som vi ska skriva.
 Input textfilerna kan komma att behöva flyttas in i main.java.prop_0 paketet.
 
 Inga associationer mellan klasser gjorda för tillfället..
+
+
+
+===TODO
+Build identifier
+ kolla att å ä och ö inte accepteras

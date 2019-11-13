@@ -2,13 +2,13 @@ package main.java.PROP_0;
 
 import java.io.IOException;
 
-
 public class Tokenizer implements ITokenizer {
     Scanner scanner = new Scanner();
     Lexeme current = null;
 
     public void open(String fileName) throws IOException, TokenizerException {
-
+        scanner.open(fileName);
+        scanner.moveNext();
     }
 
     public Lexeme current() {
@@ -17,87 +17,76 @@ public class Tokenizer implements ITokenizer {
 
     public void moveNext() throws IOException, TokenizerException {
         getNonBlank();
-        try {
-            current = buildLex();
-        } catch (TokenizerException e) {
+        current = buildLex();
+    }
 
+    private void getNonBlank() throws IOException{
+        while (Character.isWhitespace(scanner.current())) {
+            scanner.moveNext();
         }
     }
 
-    private void getNonBlank() {
-        try {
-            while (Character.isWhitespace(scanner.current())) {
-                scanner.moveNext();
-            }
-        } catch (IOException e) {
-
-        }
-
-    }
-
-    private Lexeme buildLex() throws TokenizerException {
+    private Lexeme buildLex() throws TokenizerException, IOException {
         char currentChar = scanner.current();
-
+        Lexeme lex = null;
         if (Character.isLetter(currentChar)) {
-            return buildIdentifier();
+            lex = buildIdentifier();
         }
         if (Character.isDigit(currentChar)) {
-            return buildIntLiteral();
+            lex = buildIntLiteral();
         }
         if (charIsOperator(currentChar)) {
-            return identifyOperator(currentChar);
+            lex = identifyOperator(currentChar);
         }
         if (currentChar == '('){
-            return new Lexeme(currentChar,Token.LEFT_PAREN);
+            lex = new Lexeme(currentChar,Token.LEFT_PAREN);
         }
         if (currentChar == ')'){
-            return new Lexeme(currentChar, Token.RIGHT_PAREN);
+            lex = new Lexeme(currentChar, Token.RIGHT_PAREN);
         }
         if (currentChar == '{'){
-            return new Lexeme(currentChar,Token.LEFT_CURLY);
+            lex = new Lexeme(currentChar,Token.LEFT_CURLY);
         }
         if(currentChar == '}'){
-            return  new Lexeme(currentChar,Token.RIGHT_CURLY);
+            lex = new Lexeme(currentChar,Token.RIGHT_CURLY);
+        }
+        if(currentChar == ';'){
+            lex = new Lexeme(currentChar,Token.SEMICOLON);
+        }
+        if(currentChar == '=') {
+            lex = new Lexeme(currentChar, Token.ASSIGN_OP);
+        }
+        if(currentChar == scanner.EOF){
+            lex = new Lexeme(currentChar,Token.EOF);
         }
 
-        throw new TokenizerException("Illegal character in stream");
-
+        if (lex == null){
+            throw new TokenizerException("Illegal character in stream");
+        }
+        scanner.moveNext();
+        return lex;
     }
 
-    private Lexeme buildIdentifier() throws TokenizerException {
-        try {
-            char currentChar = scanner.current();
-            StringBuilder identValue = new StringBuilder();
-            while (Character.isLetter(currentChar)) {
-                identValue.append(currentChar);
-                scanner.moveNext();
-                currentChar = scanner.current();
-            }
-            if (currentChar == '=' || Character.isWhitespace(currentChar)) {
-                return new Lexeme(identValue, Token.IDENT);
-            }
-        } catch (IOException e) {
-
+    private Lexeme buildIdentifier() throws IOException{
+        char currentChar = scanner.current();
+        StringBuilder identValue = new StringBuilder();
+        while (Character.isLetter(currentChar)) {
+            identValue.append(currentChar);
+            scanner.moveNext();
+            currentChar = scanner.current();
         }
-        throw new TokenizerException("Illegal character combination in stream");
+        return new Lexeme(identValue, Token.IDENT);
     }
 
-    private Lexeme buildIntLiteral() throws TokenizerException {
-        try {
-            char currentChar = scanner.current();
-            StringBuilder identValue = new StringBuilder();
-            while (Character.isDigit(currentChar)) {
-                identValue.append(currentChar);
-                scanner.moveNext();
-                currentChar = scanner.current();
-            }
-            if (charIsOperator(currentChar) || Character.isWhitespace(currentChar)) {
-                return new Lexeme(Integer.valueOf(identValue.toString()), Token.INT_LIT);
-            }
-        } catch (IOException e) {
-
+    private Lexeme buildIntLiteral() throws IOException{
+        char currentChar = scanner.current();
+        StringBuilder identValue = new StringBuilder();
+        while (Character.isDigit(currentChar)) {
+            identValue.append(currentChar);
+            scanner.moveNext();
+            currentChar = scanner.current();
         }
-        throw new TokenizerException("Illegal character combination in stream");
+        return new Lexeme(Integer.valueOf(identValue.toString()), Token.INT_LIT);
     }
 
     private Lexeme identifyOperator(char currentChar) {
@@ -110,10 +99,7 @@ public class Tokenizer implements ITokenizer {
         if (currentChar == '*') {
             return new Lexeme(currentChar, Token.MULT_OP);
         }
-
         return new Lexeme(currentChar, Token.DIV_OP);
-
-
     }
 /*
     private boolean charIsParanthesis(char in) {
