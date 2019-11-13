@@ -60,7 +60,7 @@ public class Tokenizer implements ITokenizer {
             return  new Lexeme(currentChar,Token.RIGHT_CURLY);
         }
 
-        return null;
+        throw new TokenizerException("Illegal character in stream");
 
     }
 
