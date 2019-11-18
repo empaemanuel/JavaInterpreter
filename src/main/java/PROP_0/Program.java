@@ -8,28 +8,25 @@ public class Program {
 
 	public static void main(String[] args){
 		String inputFileName = "src/program2.txt";
+		StringBuilder sb = new StringBuilder();
 
-
-		Tokenizer t = new Tokenizer();
+		Parser p = new Parser();
 		try {
-			t.open(inputFileName);
-
+			p.open(inputFileName);
 		} catch (Exception e){
 			e.printStackTrace();
-			System.out.println("fel");
 			return;
 		}
 
 		try {
-			t.moveNext();
-			while(t.current().token() != Token.EOF) {
-				t.moveNext();
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (TokenizerException e) {
+			p.parse().buildString(sb, 0);
+		} catch (Exception e){
 			e.printStackTrace();
 		}
+
+		System.out.println(sb);
+
+
 	}
 
 
