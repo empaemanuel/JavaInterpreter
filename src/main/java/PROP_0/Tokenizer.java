@@ -20,7 +20,7 @@ public class Tokenizer implements ITokenizer {
         current = buildLex();
     }
 
-    private void getNonBlank() throws IOException{
+    private void getNonBlank() throws IOException {
         while (Character.isWhitespace(scanner.current())) {
             scanner.moveNext();
         }
@@ -31,43 +31,35 @@ public class Tokenizer implements ITokenizer {
         Lexeme lex = null;
         if (Character.isLetter(currentChar)) {
             lex = buildIdentifier();
-        }
-        if (Character.isDigit(currentChar)) {
+        } else if (Character.isDigit(currentChar)) {
             lex = buildIntLiteral();
-        }
-        if (charIsOperator(currentChar)) {
-            lex = identifyOperator(currentChar);
-        }
-        if (currentChar == '('){
-            lex = new Lexeme(currentChar,Token.LEFT_PAREN);
-        }
-        if (currentChar == ')'){
-            lex = new Lexeme(currentChar, Token.RIGHT_PAREN);
-        }
-        if (currentChar == '{'){
-            lex = new Lexeme(currentChar,Token.LEFT_CURLY);
-        }
-        if(currentChar == '}'){
-            lex = new Lexeme(currentChar,Token.RIGHT_CURLY);
-        }
-        if(currentChar == ';'){
-            lex = new Lexeme(currentChar,Token.SEMICOLON);
-        }
-        if(currentChar == '=') {
-            lex = new Lexeme(currentChar, Token.ASSIGN_OP);
-        }
-        if(currentChar == scanner.EOF){
-            lex = new Lexeme(currentChar,Token.EOF);
+        } else {
+            if (charIsOperator(currentChar)) {
+                lex = identifyOperator(currentChar);
+            } else if (currentChar == '(') {
+                lex = new Lexeme(currentChar, Token.LEFT_PAREN);
+            } else if (currentChar == ')') {
+                lex = new Lexeme(currentChar, Token.RIGHT_PAREN);
+            } else if (currentChar == '{') {
+                lex = new Lexeme(currentChar, Token.LEFT_CURLY);
+            } else if (currentChar == '}') {
+                lex = new Lexeme(currentChar, Token.RIGHT_CURLY);
+            } else if (currentChar == ';') {
+                lex = new Lexeme(currentChar, Token.SEMICOLON);
+            } else if (currentChar == '=') {
+                lex = new Lexeme(currentChar, Token.ASSIGN_OP);
+            } else if (currentChar == scanner.EOF) {
+                lex = new Lexeme(currentChar, Token.EOF);
+            } else if (lex == null) {
+                throw new TokenizerException("Illegal character in stream");
+            }
+            scanner.moveNext();
         }
 
-        if (lex == null){
-            throw new TokenizerException("Illegal character in stream");
-        }
-        scanner.moveNext();
         return lex;
     }
 
-    private Lexeme buildIdentifier() throws IOException{
+    private Lexeme buildIdentifier() throws IOException {
         char currentChar = scanner.current();
         StringBuilder identValue = new StringBuilder();
         while (Character.isLetter(currentChar)) {
@@ -78,7 +70,7 @@ public class Tokenizer implements ITokenizer {
         return new Lexeme(identValue, Token.IDENT);
     }
 
-    private Lexeme buildIntLiteral() throws IOException{
+    private Lexeme buildIntLiteral() throws IOException {
         char currentChar = scanner.current();
         StringBuilder identValue = new StringBuilder();
         while (Character.isDigit(currentChar)) {
@@ -101,14 +93,6 @@ public class Tokenizer implements ITokenizer {
         }
         return new Lexeme(currentChar, Token.DIV_OP);
     }
-/*
-    private boolean charIsParanthesis(char in) {
-        if (in == '(' || in == ')') {
-            return true;
-        }
-        return false;
-    }
-*/
     private boolean charIsOperator(char in) {
         if (in == '/' || in == '*' || in == '+' || in == '-') {
             return true;

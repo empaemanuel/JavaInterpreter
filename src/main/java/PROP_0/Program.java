@@ -1,30 +1,40 @@
 package main.java.PROP_0;
 
 import java.io.IOException;
+import java.util.List;
 
 public class Program {
 
-
+	static private List<List<Object>> table;
+	static INode resultNode;
 
 	public static void main(String[] args){
 		String inputFileName = "src/program2.txt";
 		StringBuilder sb = new StringBuilder();
 
 		Parser p = new Parser();
+
 		try {
 			p.open(inputFileName);
+			resultNode = p.parse();
+			//resultNode.buildString(sb,0);
+			//Object[] a = resultNode.evaluate(new Object[]{});
+			/*for (Object object :a){
+				System.out.println(resultNode.evaluate(new Object[]{}));
+			}
+
+			 */
+
+			Object thing = resultNode.evaluate(new Object[]{});
+			Object[] list = (Object[]) thing;
+			for (Object object: list){
+				Parser.AssignmentNode node = (Parser.AssignmentNode) object;
+				System.out.println(node.getIdentVal()+"= "+node.getIntval());
+			}
 		} catch (Exception e){
 			e.printStackTrace();
 			return;
 		}
-
-		try {
-			p.parse().buildString(sb, 0);
-		} catch (Exception e){
-			e.printStackTrace();
-		}
-
-		System.out.println(sb);
 
 
 	}
