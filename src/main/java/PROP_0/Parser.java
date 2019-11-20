@@ -2,9 +2,6 @@ package main.java.PROP_0;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 
 public class Parser implements IParser {
     private Tokenizer t = null;
@@ -116,7 +113,7 @@ public class Parser implements IParser {
     public class AssignmentNode implements INode {
         ExpressionNode en = null;
         String identVal;
-        int intval;
+        double intval;
 
         public AssignmentNode(Tokenizer t) throws TokenizerException, IOException, ParserException {
             if (t.current().token() != Token.IDENT) {
@@ -143,7 +140,7 @@ public class Parser implements IParser {
         }
 
         public Object evaluate(Object[] args) throws Exception {
-            intval = (int) en.evaluate(args);
+            intval = (double) en.evaluate(args);
             return this;
 
         }
@@ -152,7 +149,7 @@ public class Parser implements IParser {
             return identVal;
         }
 
-        public int getIntval() {
+        public double getIntval() {
             return intval;
         }
 
@@ -189,12 +186,12 @@ public class Parser implements IParser {
 
         public Object evaluate(Object[] args) throws Exception {
 
-            int sum = (int) tn.evaluate(args);
+            double sum = (double) tn.evaluate(args);
             if (add == 1) {
-                sum += (int) en.evaluate(args);
+                sum += (double) en.evaluate(args);
             }
             if (add == 2) {
-                sum -= (int) en.evaluate(args);
+                sum -= (double) en.evaluate(args);
             }
             return sum;
         }
@@ -233,12 +230,30 @@ public class Parser implements IParser {
         }
 
         public Object evaluate(Object[] args) throws Exception {
-            int sum = (int) fn.evaluate(args);
-            if (mult == 1) {
-                sum *= (int) tn.evaluate(args);
-            }
-            if (mult == 2) {
-                sum /= (int) tn.evaluate(args);
+            double sum = (double)fn.evaluate(args);
+            if(mult == 2){
+                if(args.length>0){
+                    if(args[args.length-1] instanceof Integer) {
+                        if ((Integer) args[args.length - 1] == 1) {
+                            sum *= (double) tn.evaluate(args);
+                        }
+                    }
+                } else {
+                    Object[] tempArgs = Arrays.copyOf(args, args.length+1);
+                    tempArgs[tempArgs.length - 1] = 1;
+                    args = tempArgs;
+                    sum /= (double) tn.evaluate(args);
+                }
+            } else if(mult == 1){
+                if(args.length>0){
+                    if(args[args.length-1] instanceof Integer) {
+                        if ((Integer) args[args.length - 1] == 1) {
+                            return sum;
+                        }
+                    }
+                } else {
+                    sum *= (double) tn.evaluate(args);
+                }
             }
             return sum;
         }
@@ -290,7 +305,7 @@ public class Parser implements IParser {
 
         public Object evaluate(Object[] args) throws Exception {
             if (flag == 1) {
-                return intlit;
+                return getIntlit();
             } else if (flag == 2) {
                 for (Object object : args) {
                     AssignmentNode node = (AssignmentNode) object;
@@ -305,8 +320,8 @@ public class Parser implements IParser {
             return this;
         }
 
-        public int getIntlit() {
-            return intlit;
+        public double getIntlit() {
+            return (double)intlit;
         }
 
         public String getIdent() {

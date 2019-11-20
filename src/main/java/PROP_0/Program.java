@@ -9,7 +9,7 @@ public class Program {
 	static INode resultNode;
 
 	public static void main(String[] args){
-		String inputFileName = "src/program2.txt";
+		String inputFileName = "src/program3.txt";
 		StringBuilder sb = new StringBuilder();
 
 		Parser p = new Parser();
