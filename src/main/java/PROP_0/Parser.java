@@ -232,11 +232,9 @@ public class Parser implements IParser {
         public Object evaluate(Object[] args) throws Exception {
             double sum = (double)fn.evaluate(args);
             if(mult == 2){
-                if(args.length>0){
-                    if(args[args.length-1] instanceof Integer) {
-                        if ((Integer) args[args.length - 1] == 1) {
-                            sum *= (double) tn.evaluate(args);
-                        }
+                if(args.length>0 && args[args.length-1] instanceof Integer) {
+                    if ((Integer) args[args.length - 1] == 1) {
+                        sum *= (double) tn.evaluate(args);
                     }
                 } else {
                     Object[] tempArgs = Arrays.copyOf(args, args.length+1);
@@ -245,11 +243,13 @@ public class Parser implements IParser {
                     sum /= (double) tn.evaluate(args);
                 }
             } else if(mult == 1){
-                if(args.length>0){
-                    if(args[args.length-1] instanceof Integer) {
-                        if ((Integer) args[args.length - 1] == 1) {
-                            return sum;
+                if(args.length>0 && args[args.length-1] instanceof Integer) {
+                    if ((Integer) args[args.length - 1] == 1) {
+                        Object[] tempArgs = new Object[args.length-1];
+                        for(int i = 0; i < args.length-1; i++){
+                            tempArgs[i] = args[i];
                         }
+
                     }
                 } else {
                     sum *= (double) tn.evaluate(args);
