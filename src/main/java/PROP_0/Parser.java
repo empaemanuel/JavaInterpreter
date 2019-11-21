@@ -1,11 +1,10 @@
 package main.java.PROP_0;
 
 import java.io.IOException;
-import java.util.Arrays;
 
-public class Parser implements IParser {
+public class Parser implements IParser{
+
     private Tokenizer t = null;
-
 
     public void open(String fileName) throws IOException, TokenizerException {
         t = new Tokenizer();
@@ -21,17 +20,8 @@ public class Parser implements IParser {
 
     }
 
-    private void addNewLine(StringBuilder builder, int tabs, String str) {
-        for (int i = 0; i < tabs; i++) {
-            builder.append("\t");
-        }
-        builder.append(str);
-        builder.append("\n");
-    }
-
     public class BlockNode implements INode {
-        StatementNode sn = null;
-        int flag = 0;
+        private StatementNode sn = null;
 
         public BlockNode(Tokenizer t) throws TokenizerException, IOException, ParserException {
             if (t.current().token() != Token.LEFT_CURLY) {
@@ -39,9 +29,7 @@ public class Parser implements IParser {
             }
             t.moveNext();
 
-
-            if (t.current().token() != Token.RIGHT_CURLY) {
-                flag = 1;
+            if (t.current().token() == Token.IDENT) {
                 sn = new StatementNode(t);
             }
 
@@ -50,31 +38,35 @@ public class Parser implements IParser {
             }
             t.moveNext();
 
-
             if (t.current().token() != Token.EOF) {
                 throwException(t.current().token(), Token.EOF);
             }
             t.close();
-
         }
 
+        @Override
         public Object evaluate(Object[] args) throws Exception {
-            return sn.evaluate(args);
+            sn.evaluate(args);
+            return args;
         }
 
+        @Override
         public void buildString(StringBuilder builder, int tabs) {
-            addNewLine(builder, tabs, "BlockNode");
-            addNewLine(builder, tabs, Token.LEFT_CURLY.toString());
-            if (flag == 1) {
+            addNewLineToBuilder(builder, tabs, "BlockNode");
+            addNewLineToBuilder(builder, tabs, Token.LEFT_CURLY.toString());
+            if (sn != null){
+                tabs++;
                 sn.buildString(builder, tabs);
+                tabs--;
             }
-            addNewLine(builder, tabs, Token.RIGHT_CURLY.toString());
+            addNewLineToBuilder(builder, tabs, Token.RIGHT_CURLY.toString());
+
         }
     }
 
     public class StatementNode implements INode {
-        AssignmentNode an = null;
-        StatementNode sn = null;
+        private AssignmentNode an = null;
+        private StatementNode sn = null;
 
         public StatementNode(Tokenizer t) throws TokenizerException, IOException, ParserException {
             if (t.current().token() == Token.IDENT) {
@@ -83,51 +75,44 @@ public class Parser implements IParser {
             }
         }
 
+        @Override
         public Object evaluate(Object[] args) throws Exception {
-            Object[] tempArgs = Arrays.copyOf(args, args.length + 1);
-
-            if (an != null) {
-                tempArgs[tempArgs.length - 1] = an.evaluate(args);
-                args = tempArgs;
+            an.evaluate(args);
+            if(sn!=null){
+                sn.evaluate(args);
             }
-
-            if (sn != null) {
-                return sn.evaluate(args);
-            }
-
-            return args;
+            return null;
         }
 
+        @Override
         public void buildString(StringBuilder builder, int tabs) {
-            tabs++;
-            addNewLine(builder, tabs, "Statament Node");
-            if (an != null) {
+            addNewLineToBuilder(builder, tabs, "StatementNode");
+            if(an != null){
+                tabs++;
                 an.buildString(builder, tabs);
+                tabs--;
             }
-            if (sn != null) {
+            if(sn != null){
+                tabs++;
                 sn.buildString(builder, tabs);
             }
         }
     }
 
     public class AssignmentNode implements INode {
-        ExpressionNode en = null;
-        String identVal;
-        double intval;
+        private String identifier;
+        private ExpressionNode en;
 
         public AssignmentNode(Tokenizer t) throws TokenizerException, IOException, ParserException {
             if (t.current().token() != Token.IDENT) {
                 throwException(t.current().token(), Token.IDENT);
             }
-            identVal = ((StringBuilder) t.current.value()).toString();
-
+            identifier = t.current.value().toString();
             t.moveNext();
-
 
             if (t.current().token() != Token.ASSIGN_OP) {
                 throwException(t.current().token(), Token.ASSIGN_OP);
             }
-            //lägg till = till buildstring
             t.moveNext();
 
             en = new ExpressionNode(t);
@@ -135,215 +120,158 @@ public class Parser implements IParser {
             if (t.current().token() != Token.SEMICOLON) {
                 throwException(t.current().token(), Token.SEMICOLON);
             }
-
             t.moveNext();
         }
 
+        @Override
         public Object evaluate(Object[] args) throws Exception {
-            intval = (double) en.evaluate(args);
-            return this;
-
+            Evaluator eval = (Evaluator) args[0];
+            eval.putIdentValue(identifier, (double) en.evaluate(args));
+            return null;
         }
 
-        public String getIdentVal() {
-            return identVal;
-        }
-
-        public double getIntval() {
-            return intval;
-        }
-
+        @Override
         public void buildString(StringBuilder builder, int tabs) {
+            addNewLineToBuilder(builder, tabs, "AssignmentNode");
             tabs++;
-            addNewLine(builder, tabs, "Assignment Node");
-            tabs++;
-            addNewLine(builder, tabs, Token.IDENT.toString() + " " + identVal);
-            addNewLine(builder, tabs, Token.ASSIGN_OP.toString() + " =");
+            addNewLineToBuilder(builder, tabs, Token.IDENT.toString() + " " + identifier);
+            addNewLineToBuilder(builder, tabs, Token.ASSIGN_OP.toString() + " " + "=");
             en.buildString(builder, tabs);
-            addNewLine(builder, tabs, Token.SEMICOLON.toString());
+            addNewLineToBuilder(builder, tabs, Token.SEMICOLON.toString() + " ;");
         }
     }
 
     public class ExpressionNode implements INode {
-        TermNode tn = null;
-        ExpressionNode en = null;
-        int add = 0;
+        private TermNode tn;
+        private Token operator;
+        private ExpressionNode en = null;
 
         public ExpressionNode(Tokenizer t) throws TokenizerException, IOException, ParserException {
             tn = new TermNode(t);
 
-
-            if (t.current().token() == Token.ADD_OP) {
-                add = 1;
-                t.moveNext();
-                en = new ExpressionNode(t);
-            } else if (t.current().token() == Token.SUB_OP) {
-                add = 2;
+            operator = t.current().token();
+            if (operator == Token.SUB_OP || operator == Token.ADD_OP) {
                 t.moveNext();
                 en = new ExpressionNode(t);
             }
         }
 
+        @Override
         public Object evaluate(Object[] args) throws Exception {
+            double sum;
+            if(en != null){
 
-            double sum = (double) tn.evaluate(args);
-            if (add == 1) {
-                sum += (double) en.evaluate(args);
             }
-            if (add == 2) {
-                sum -= (double) en.evaluate(args);
-            }
-            return sum;
+            return null;
         }
 
+        @Override
         public void buildString(StringBuilder builder, int tabs) {
-            addNewLine(builder, tabs, "Expression Node");
+            addNewLineToBuilder(builder, tabs, "ExpressionNode");
+            tabs++;
             tn.buildString(builder, tabs);
-            if (add == 1) {
-                addNewLine(builder, tabs, Token.ADD_OP.toString() + " +");
-            } else if (add == 2) {
-                addNewLine(builder, tabs, Token.ADD_OP.toString() + " -");
-            }
-            if (add > 0) {
-                en.buildString(builder, tabs);
+
+            if(en != null){
+                String ext = Token.SUB_OP.toString() + " -";;
+                if(operator == Token.ADD_OP){
+                    ext = Token.ADD_OP.toString() + " +";
+                }
+                addNewLineToBuilder(builder, tabs, ext);
+
+                en.buildString(builder,tabs);
             }
         }
     }
 
     public class TermNode implements INode {
-        FactorNode fn = null;
-        TermNode tn = null;
-        int mult = 0;
+        private FactorNode fn;
+        private Token operator;
+        private TermNode tn = null;
 
         public TermNode(Tokenizer t) throws TokenizerException, IOException, ParserException {
             fn = new FactorNode(t);
+            operator = t.current().token();
 
-            if (t.current().token() == Token.MULT_OP) {
-                mult = 1;
-                t.moveNext();
-                tn = new TermNode(t);
-            } else if (t.current().token() == Token.DIV_OP) {
-                mult = 2;
+            if (operator == Token.MULT_OP || operator == Token.DIV_OP) {
                 t.moveNext();
                 tn = new TermNode(t);
             }
         }
 
+        @Override
         public Object evaluate(Object[] args) throws Exception {
-            double sum = (double)fn.evaluate(args);
-            if(mult == 2){
-                if(args.length>0 && args[args.length-1] instanceof Integer) {
-                    if ((Integer) args[args.length - 1] == 1) {
-                        sum *= (double) tn.evaluate(args);
-                    }
-                } else {
-                    Object[] tempArgs = Arrays.copyOf(args, args.length+1);
-                    tempArgs[tempArgs.length - 1] = 1;
-                    args = tempArgs;
-                    sum /= (double) tn.evaluate(args);
-                }
-            } else if(mult == 1){
-                if(args.length>0 && args[args.length-1] instanceof Integer) {
-                    if ((Integer) args[args.length - 1] == 1) {
-                        Object[] tempArgs = new Object[args.length-1];
-                        for(int i = 0; i < args.length-1; i++){
-                            tempArgs[i] = args[i];
-                        }
-
-                    }
-                } else {
-                    sum *= (double) tn.evaluate(args);
-                }
-            }
-            return sum;
+            return null;
         }
 
+        @Override
         public void buildString(StringBuilder builder, int tabs) {
+            addNewLineToBuilder(builder, tabs, "TermNode");
             tabs++;
-            addNewLine(builder, tabs, "Term Node");
-            fn.buildString(builder, tabs);
-            tabs++;
-            if (mult == 1) {
-                addNewLine(builder, tabs, Token.MULT_OP + " *");
-            } else if (mult == 2) {
-                addNewLine(builder, tabs, Token.DIV_OP + " /");
-            }
-            if (mult > 0) {
-                tabs--;
+            fn.buildString(builder,tabs);
+            if(tn!=null){
+                String ext = Token.MULT_OP.toString() + " *";
+                if(operator == Token.DIV_OP){
+                    ext = Token.DIV_OP.toString() + " /";
+                }
+                addNewLineToBuilder(builder, tabs, ext);
                 tn.buildString(builder, tabs);
             }
         }
     }
 
     public class FactorNode implements INode {
-        ExpressionNode en = null;
-        int intlit;
-        String ident;
-        int flag;
+        private String identifier = null;
+        private Integer literal = null;
+        private ExpressionNode en = null;
 
         public FactorNode(Tokenizer t) throws TokenizerException, IOException, ParserException {
-            if (t.current().token() == Token.INT_LIT) {
-                flag = 1;
-                intlit = (int) t.current.value();
-                t.moveNext();
-            } else if (t.current().token() == Token.IDENT) {
-                flag = 2;
-                ident = t.current.value().toString();
-                t.moveNext();
-            } else if (t.current().token() == Token.LEFT_PAREN) {
-                flag = 3;
+            Token token = t.current().token();
+
+            if (token == Token.IDENT) {
+                identifier = t.current().value().toString();
+            } else if (token == Token.INT_LIT) {
+                literal = (int) t.current.value();
+            } else if (token == Token.LEFT_PAREN) {
                 t.moveNext();
                 en = new ExpressionNode(t);
-
-                if (t.current().token() == Token.RIGHT_PAREN) {
-                    t.moveNext();
-                } else {
-                    throwException(t.current().token(), Token.RIGHT_PAREN);
+                token = t.current().token();
+                if (token != Token.RIGHT_PAREN) {
+                    throwException(token, Token.RIGHT_PAREN);
                 }
             }
+            t.moveNext();
         }
 
+        @Override
         public Object evaluate(Object[] args) throws Exception {
-            if (flag == 1) {
-                return getIntlit();
-            } else if (flag == 2) {
-                for (Object object : args) {
-                    AssignmentNode node = (AssignmentNode) object;
-                    if (this.ident.equals(node.getIdentVal())){
-                        return node.getIntval();
-                    }
-                }
-                throw new Exception();
-            } else if(flag == 3){
-                return en.evaluate(args);
-            }
-            return this;
+            return null;
         }
 
-        public double getIntlit() {
-            return (double)intlit;
-        }
-
-        public String getIdent() {
-            return ident;
-        }
-
+        @Override
         public void buildString(StringBuilder builder, int tabs) {
-            int t = ++tabs;
-            addNewLine(builder, t, "FactorNode");
-            if (flag == 1) {
-                addNewLine(builder, ++t, Token.INT_LIT + " " + intlit);
-            } else if (flag == 2) {
-                addNewLine(builder, ++t, Token.IDENT + " " + ident);
-            } else if (flag == 3) {
-                addNewLine(builder, ++t, Token.LEFT_PAREN + " (");
-                en.buildString(builder, tabs);
-                addNewLine(builder, ++t, Token.RIGHT_PAREN + " )");
+            addNewLineToBuilder(builder, tabs, "FactorNode");
+            tabs++;
+            if(identifier != null){
+                addNewLineToBuilder(builder, tabs, Token.IDENT + " " + identifier);
+            }
+            if(literal != null){
+                addNewLineToBuilder(builder, tabs, Token.INT_LIT + " " + (double) literal);
             }
 
-
+            if(en != null){
+                addNewLineToBuilder(builder, tabs, Token.LEFT_PAREN.toString() + " (");
+                en.buildString(builder, tabs);
+                addNewLineToBuilder(builder,tabs,Token.RIGHT_PAREN.toString() + " )");
+            }
         }
+    }
 
+    private void addNewLineToBuilder(StringBuilder builder, int tabs, String str) {
+        for (int i = 0; i < tabs; i++) {
+            builder.append("\t");
+        }
+        builder.append(str);
+        builder.append("\n");
     }
 
     private void throwException(Token foundToken, Token... expectedTokens) throws ParserException {

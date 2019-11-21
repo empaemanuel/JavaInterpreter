@@ -1,6 +1,5 @@
 package main.java.PROP_0;
 
-import java.io.IOException;
 import java.util.List;
 
 public class Program {
@@ -9,14 +8,19 @@ public class Program {
 	static INode resultNode;
 
 	public static void main(String[] args){
-		String inputFileName = "src/program3.txt";
+		String inputFileName = "src/program2.txt";
 		StringBuilder sb = new StringBuilder();
+		Evaluator eval = new Evaluator();
 
 		Parser p = new Parser();
 
 		try {
 			p.open(inputFileName);
 			resultNode = p.parse();
+			resultNode.buildString(sb, 0);
+			//resultNode.evaluate(new Object[]{eval});
+			System.out.println(sb.toString());
+
 			//resultNode.buildString(sb,0);
 			//Object[] a = resultNode.evaluate(new Object[]{});
 			/*for (Object object :a){
@@ -25,12 +29,8 @@ public class Program {
 
 			 */
 
-			Object thing = resultNode.evaluate(new Object[]{});
-			Object[] list = (Object[]) thing;
-			for (Object object: list){
-				Parser.AssignmentNode node = (Parser.AssignmentNode) object;
-				System.out.println(node.getIdentVal()+"= "+node.getIntval());
-			}
+
+
 		} catch (Exception e){
 			e.printStackTrace();
 			return;
