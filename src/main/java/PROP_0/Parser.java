@@ -16,6 +16,7 @@ public class Parser implements IParser{
         return new BlockNode(t);
     }
 
+
     public void close() throws IOException {
 
     }
@@ -46,8 +47,11 @@ public class Parser implements IParser{
 
         @Override
         public Object evaluate(Object[] args) throws Exception {
-            sn.evaluate(args);
-            return args;
+            Evaluator e = (Evaluator) args[0];
+            if(sn!=null){
+                e = (Evaluator) sn.evaluate(args);
+            }
+            return e;
         }
 
         @Override
@@ -77,11 +81,13 @@ public class Parser implements IParser{
 
         @Override
         public Object evaluate(Object[] args) throws Exception {
-            an.evaluate(args);
-            if(sn!=null){
+            if(an != null) {
+                an.evaluate(args);
+            }
+            if(sn != null){
                 sn.evaluate(args);
             }
-            return null;
+            return args[0];
         }
 
         @Override
@@ -125,9 +131,15 @@ public class Parser implements IParser{
 
         @Override
         public Object evaluate(Object[] args) throws Exception {
-            Evaluator eval = (Evaluator) args[0];
-            eval.putIdentValue(identifier, (double) en.evaluate(args));
-            return null;
+            Evaluator eval = (Evaluator) args [0];
+
+            eval.putStatementValue(identifier, 0.0);
+
+            Double sum = (double) en.evaluate(args);
+
+            eval.putStatementValue(identifier, sum);
+
+            return eval;
         }
 
         @Override
@@ -158,11 +170,27 @@ public class Parser implements IParser{
 
         @Override
         public Object evaluate(Object[] args) throws Exception {
-            double sum;
-            if(en != null){
+            double sum = (double) args[1];
+            Token op = (Token) args[2];
+            args[1] = 0.0; args[2] = null;
 
+            double end = (double) tn.evaluate(args);
+
+            if(op == Token.ADD_OP){
+                sum += end;
+            } else if(op == Token.SUB_OP){
+                sum -= end;
+            } else {
+                sum = end;
             }
-            return null;
+
+            if(en != null){
+                args[1] = sum;
+                args[2] = operator;
+                sum = (double) en.evaluate(args);
+            }
+
+            return sum;
         }
 
         @Override
@@ -181,6 +209,7 @@ public class Parser implements IParser{
                 en.buildString(builder,tabs);
             }
         }
+
     }
 
     public class TermNode implements INode {
@@ -200,7 +229,28 @@ public class Parser implements IParser{
 
         @Override
         public Object evaluate(Object[] args) throws Exception {
-            return null;
+            double sum = (double) args[1];
+            Token op = (Token) args[2];
+            args[1] = 0.0; args[2] = null;
+
+            double end = (double) fn.evaluate(args);
+
+            if(op == Token.MULT_OP){
+                sum *= end;
+            } else if(op == Token.DIV_OP){
+                sum /= end;
+            } else {
+                sum = end;
+            }
+
+            if(tn != null){
+                args[1] = sum;
+                args[2] = operator;
+                sum = (double) tn.evaluate(args);
+            }
+
+            return sum;
+
         }
 
         @Override
@@ -244,7 +294,15 @@ public class Parser implements IParser{
 
         @Override
         public Object evaluate(Object[] args) throws Exception {
-            return null;
+            if(identifier != null){
+                Evaluator eval = (Evaluator) args[0];
+                return eval.getStatementValue(identifier);
+            }else if(literal != null){
+                return (double) literal;
+            } else {
+                return en.evaluate(args);
+            }
+
         }
 
         @Override

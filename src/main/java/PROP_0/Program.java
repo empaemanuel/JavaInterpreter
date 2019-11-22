@@ -10,16 +10,22 @@ public class Program {
 	public static void main(String[] args){
 		String inputFileName = "src/program2.txt";
 		StringBuilder sb = new StringBuilder();
-		Evaluator eval = new Evaluator();
 
 		Parser p = new Parser();
+
+		Evaluator eval = new Evaluator();
+		Object[] evalArgs = {eval, 0.0, null};
+
 
 		try {
 			p.open(inputFileName);
 			resultNode = p.parse();
 			resultNode.buildString(sb, 0);
-			//resultNode.evaluate(new Object[]{eval});
+			resultNode.evaluate(evalArgs);
 			System.out.println(sb.toString());
+			eval.getStatementValues().entrySet().forEach(entry->{
+				System.out.println(entry.getKey() + " = " + entry.getValue());
+			});
 
 			//resultNode.buildString(sb,0);
 			//Object[] a = resultNode.evaluate(new Object[]{});
