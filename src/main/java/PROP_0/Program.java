@@ -1,3 +1,5 @@
+/* developed by Emil Madrell and Mohammed Hussein Nov2019 */
+
 package main.java.PROP_0;
 
 import java.io.*;
@@ -29,7 +31,7 @@ public class Program {
                     String furg = (entry.getKey() + " = " + numberFormat.format(entry.getValue()) + "\n");
                     sb.append(furg);
                 }
-                File file = new File(args[1]);
+                File file = new File(outputFileName);
                 BufferedWriter writer = null;
                 try {
                     writer = new BufferedWriter(new FileWriter(file));
@@ -46,9 +48,5 @@ public class Program {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-
     }
-
-
 }

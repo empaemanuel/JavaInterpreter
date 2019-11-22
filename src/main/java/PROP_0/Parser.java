@@ -1,3 +1,5 @@
+/* developed by Emil Madrell and Mohammed Hussein Nov2019 */
+
 package main.java.PROP_0;
 
 import java.io.IOException;
@@ -70,13 +72,13 @@ public class Parser implements IParser{
         @Override
         public void buildString(StringBuilder builder, int tabs) {
             addNewLineToBuilder(builder, tabs, "BlockNode");
-            addNewLineToBuilder(builder, tabs, Token.LEFT_CURLY.toString());
+            addNewLineToBuilder(builder, tabs, Token.LEFT_CURLY.toString() + " {");
             if (sn != null){
                 tabs++;
                 sn.buildString(builder, tabs);
                 tabs--;
             }
-            addNewLineToBuilder(builder, tabs, Token.RIGHT_CURLY.toString());
+            addNewLineToBuilder(builder, tabs, Token.RIGHT_CURLY.toString() + " }");
 
         }
     }
@@ -222,7 +224,6 @@ public class Parser implements IParser{
                 en.buildString(builder,tabs);
             }
         }
-
     }
 
     public class TermNode implements INode {
@@ -261,9 +262,7 @@ public class Parser implements IParser{
                 args[1] = operator;
                 sum = (double) tn.evaluate(args);
             }
-
             return sum;
-
         }
 
         @Override
