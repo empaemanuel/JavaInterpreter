@@ -39,8 +39,7 @@ public class Program {
                 } finally {
                     if (writer != null) writer.close();
                 }
-
-
+                parser.close();
             } catch (Exception e) {
                 e.printStackTrace();
                 return;
