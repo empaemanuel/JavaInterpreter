@@ -1,10 +1,12 @@
 package main.java.PROP_0;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 public class Parser implements IParser{
 
     private Tokenizer t = null;
+    private HashMap<String,Double> statementValues = new HashMap<>();
 
     public void open(String fileName) throws IOException, TokenizerException {
         t = new Tokenizer();
@@ -19,6 +21,18 @@ public class Parser implements IParser{
 
     public void close() throws IOException {
 
+    }
+
+    public void putStatementValue(String identifier, Double value){
+        this.statementValues.put(identifier, value);
+    }
+
+    public double getStatementValue(String identifier){
+        return statementValues.get(identifier);
+    }
+
+    public HashMap<String, Double> getStatementValues(){
+        return statementValues;
     }
 
     public class BlockNode implements INode {
@@ -47,11 +61,10 @@ public class Parser implements IParser{
 
         @Override
         public Object evaluate(Object[] args) throws Exception {
-            Evaluator e = (Evaluator) args[0];
             if(sn!=null){
-                e = (Evaluator) sn.evaluate(args);
+                sn.evaluate(args);
             }
-            return e;
+            return null;
         }
 
         @Override
@@ -131,15 +144,15 @@ public class Parser implements IParser{
 
         @Override
         public Object evaluate(Object[] args) throws Exception {
-            Evaluator eval = (Evaluator) args [0];
+            //Evaluator eval = (Evaluator) args [0];
 
-            eval.putStatementValue(identifier, 0.0);
+            putStatementValue(identifier, 0.0);
 
             Double sum = (double) en.evaluate(args);
 
-            eval.putStatementValue(identifier, sum);
+            putStatementValue(identifier, sum);
 
-            return eval;
+            return statementValues;
         }
 
         @Override
@@ -295,8 +308,8 @@ public class Parser implements IParser{
         @Override
         public Object evaluate(Object[] args) throws Exception {
             if(identifier != null){
-                Evaluator eval = (Evaluator) args[0];
-                return eval.getStatementValue(identifier);
+                //Evaluator eval = (Evaluator) args[0];
+                return getStatementValue(identifier);
             }else if(literal != null){
                 return (double) literal;
             } else {
