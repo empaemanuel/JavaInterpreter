@@ -183,9 +183,9 @@ public class Parser implements IParser{
 
         @Override
         public Object evaluate(Object[] args) throws Exception {
-            double sum = (double) args[1];
-            Token op = (Token) args[2];
-            args[1] = 0.0; args[2] = null;
+            double sum = (double) args[0];
+            Token op = (Token) args[1];
+            args[0] = 0.0; args[1] = null;
 
             double end = (double) tn.evaluate(args);
 
@@ -198,8 +198,8 @@ public class Parser implements IParser{
             }
 
             if(en != null){
-                args[1] = sum;
-                args[2] = operator;
+                args[0] = sum;
+                args[1] = operator;
                 sum = (double) en.evaluate(args);
             }
 
@@ -242,9 +242,9 @@ public class Parser implements IParser{
 
         @Override
         public Object evaluate(Object[] args) throws Exception {
-            double sum = (double) args[1];
-            Token op = (Token) args[2];
-            args[1] = 0.0; args[2] = null;
+            double sum = (double) args[0];
+            Token op = (Token) args[1];
+            args[0] = 0.0; args[1] = null;
 
             double end = (double) fn.evaluate(args);
 
@@ -257,8 +257,8 @@ public class Parser implements IParser{
             }
 
             if(tn != null){
-                args[1] = sum;
-                args[2] = operator;
+                args[0] = sum;
+                args[1] = operator;
                 sum = (double) tn.evaluate(args);
             }
 
@@ -308,7 +308,6 @@ public class Parser implements IParser{
         @Override
         public Object evaluate(Object[] args) throws Exception {
             if(identifier != null){
-                //Evaluator eval = (Evaluator) args[0];
                 return getStatementValue(identifier);
             }else if(literal != null){
                 return (double) literal;

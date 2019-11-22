@@ -22,7 +22,7 @@ public class Program {
                 resultNode = parser.parse();
                 resultNode.buildString(sb, 0);
 
-                Object[] evalArgs = {0.0, 0.0, null};
+                Object[] evalArgs = {0.0, null};
                 resultNode.evaluate(evalArgs);
                 HashMap<String, Double> evalmap = parser.getStatementValues();
                 DecimalFormat numberFormat = new DecimalFormat("#0.0");
