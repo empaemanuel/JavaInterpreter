@@ -1,6 +1,6 @@
 /* developed by Emil Madrell and Mohammed Hussein Nov2019 */
 
-package main.java.PROP_0;
+package PROP_0;
 
 import java.io.*;
 import java.text.DecimalFormat;
@@ -12,7 +12,6 @@ public class Program {
 
     public static void main(String[] args) {
         try {
-
             String inputFileName = args[0];
             String outputFileName = args[1];
             try {
@@ -25,6 +24,7 @@ public class Program {
 
                 Object[] evalArgs = {0.0, null};
                 resultNode.evaluate(evalArgs);
+
                 HashMap<String, Double> evalmap = parser.getStatementValues();
                 DecimalFormat numberFormat = new DecimalFormat("#0.0");
                 for (HashMap.Entry<String, Double> entry : evalmap.entrySet()) {

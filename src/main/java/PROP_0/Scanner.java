@@ -1,4 +1,4 @@
-package main.java.PROP_0;
+package PROP_0;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
