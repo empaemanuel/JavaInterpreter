@@ -1,4 +1,4 @@
-package main.java.PROP_0;
+package PROP_0;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

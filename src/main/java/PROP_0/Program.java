@@ -1,4 +1,6 @@
-package main.java.PROP_0;
+/* developed by Emil Madrell and Mohammed Hussein Nov2019 */
+
+package PROP_0;
 
 import java.io.*;
 import java.text.DecimalFormat;
@@ -10,7 +12,6 @@ public class Program {
 
     public static void main(String[] args) {
         try {
-
             String inputFileName = args[0];
             String outputFileName = args[1];
             try {
@@ -23,13 +24,14 @@ public class Program {
 
                 Object[] evalArgs = {0.0, null};
                 resultNode.evaluate(evalArgs);
+
                 HashMap<String, Double> evalmap = parser.getStatementValues();
                 DecimalFormat numberFormat = new DecimalFormat("#0.0");
                 for (HashMap.Entry<String, Double> entry : evalmap.entrySet()) {
                     String furg = (entry.getKey() + " = " + numberFormat.format(entry.getValue()) + "\n");
                     sb.append(furg);
                 }
-                File file = new File(args[1]);
+                File file = new File(outputFileName);
                 BufferedWriter writer = null;
                 try {
                     writer = new BufferedWriter(new FileWriter(file));
@@ -45,9 +47,5 @@ public class Program {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-
     }
-
-
 }

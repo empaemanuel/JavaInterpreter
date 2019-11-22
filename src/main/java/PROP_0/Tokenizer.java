@@ -1,4 +1,6 @@
-package main.java.PROP_0;
+/* developed by Emil Madrell and Mohammed Hussein Nov2019 */
+
+package PROP_0;
 
 import java.io.IOException;
 

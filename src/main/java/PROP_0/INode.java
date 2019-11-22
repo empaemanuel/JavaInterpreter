@@ -1,4 +1,4 @@
-package main.java.PROP_0;
+package PROP_0;
 
 public interface INode {
 	/**
