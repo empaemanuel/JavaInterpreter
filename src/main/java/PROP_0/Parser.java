@@ -20,7 +20,7 @@ public class Parser implements IParser{
 
 
     public void close() throws IOException {
-
+        t.close();
     }
 
     public void putStatementValue(String identifier, Double value){

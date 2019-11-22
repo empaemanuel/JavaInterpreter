@@ -101,6 +101,6 @@ public class Tokenizer implements ITokenizer {
     }
 
     public void close() throws IOException {
-
+        scanner.close();
     }
 }
